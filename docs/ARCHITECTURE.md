@@ -67,6 +67,8 @@ graph TB
         LENDING_MCP[Lending MCP Server]
         CREDIT_MCP[Credit MCP Server]
         BANKING_MCP[Banking MCP Server]
+        ANALYTICS_MCP[Analytics MCP Server]
+        COMPLIANCE_MCP[Compliance MCP Server]
     end
 
     subgraph KPS["KPS Banking Layer"]
@@ -74,6 +76,8 @@ graph TB
         LENDING_API[Lending APIs]
         CREDIT_API[Credit APIs]
         BANKING_API[Banking APIs]
+        ANALYTICS_API[Analytics APIs]
+        COMPLIANCE_API[Compliance APIs]
     end
 
     subgraph HUMAN["Human-in-the-Loop"]
@@ -81,17 +85,20 @@ graph TB
         COMPLIANCE_TEAM[Compliance Team]
     end
 
+    %% User Flow
     USER --> GATEWAY
     GATEWAY --> SUPERVISOR
     SUPERVISOR --> PLANNER
     SUPERVISOR --> MEMORY
     SUPERVISOR --> ROUTER
 
+    %% LangGraph Flow
     PLANNER --> STATE
     STATE --> EXECUTOR
     STM --> BRIDGE
     BRIDGE --> LTM
 
+    %% Agent Orchestration
     EXECUTOR --> CRM
     EXECUTOR --> LENDING
     EXECUTOR --> CREDIT
@@ -99,18 +106,34 @@ graph TB
     EXECUTOR --> COMPLIANCE
     EXECUTOR --> RISK
 
+    %% Critical: Agent to MCP Direct Connections
+    CRM --> CRM_MCP
+    LENDING --> LENDING_MCP
+    CREDIT --> CREDIT_MCP
+    ANALYTICS --> ANALYTICS_MCP
+    COMPLIANCE --> COMPLIANCE_MCP
+    RISK --> BANKING_MCP
+
+    %% MCP Router Management
     ROUTER --> CRM_MCP
     ROUTER --> LENDING_MCP
     ROUTER --> CREDIT_MCP
     ROUTER --> BANKING_MCP
+    ROUTER --> ANALYTICS_MCP
+    ROUTER --> COMPLIANCE_MCP
 
+    %% MCP to Banking APIs
     CRM_MCP --> CRM_API
     LENDING_MCP --> LENDING_API
     CREDIT_MCP --> CREDIT_API
     BANKING_MCP --> BANKING_API
+    ANALYTICS_MCP --> ANALYTICS_API
+    COMPLIANCE_MCP --> COMPLIANCE_API
 
+    %% Human Escalation
     SUPERVISOR -.-> EXPERTS
     COMPLIANCE -.-> COMPLIANCE_TEAM
+    RISK -.-> EXPERTS
 ```
 
 ### 2.2 Enhanced Architecture Components
@@ -370,6 +393,15 @@ The Model Context Protocol (MCP) framework provides standardized, intelligent in
 
 ```mermaid
 graph TB
+    subgraph AGENTS_LAYER["Banking Agents Layer"]
+        CRM_AGENT[CRM Agent]
+        LENDING_AGENT[Lending Agent]
+        CREDIT_AGENT[Credit Agent]
+        ANALYTICS_AGENT[Analytics Agent]
+        COMPLIANCE_AGENT[Compliance Agent]
+        RISK_AGENT[Risk Agent]
+    end
+
     subgraph LANGGRAPH["LangGraph + MCP Integration"]
         WORKFLOW_ENGINE[LangGraph Workflow Engine]
         MCP_ORCHESTRATOR[MCP Orchestrator]
@@ -384,11 +416,12 @@ graph TB
         end
 
         subgraph MCP_SERVERS["Banking MCP Servers"]
-            CRM_MCP[CRM MCP Server]
-            LENDING_MCP[Lending MCP Server]
-            CREDIT_MCP[Credit MCP Server]
-            BANKING_MCP[Banking Operations MCP]
-            ANALYTICS_MCP[Analytics MCP Server]
+            CRM_MCP[CRM MCP Server<br/>Tools: Customer Lookup<br/>Resources: Customer Data<br/>Prompts: Service Templates]
+            LENDING_MCP[Lending MCP Server<br/>Tools: Application Processing<br/>Resources: Loan Products<br/>Prompts: Decision Templates]
+            CREDIT_MCP[Credit MCP Server<br/>Tools: Credit Scoring<br/>Resources: Credit Policies<br/>Prompts: Risk Explanations]
+            BANKING_MCP[Banking Operations MCP<br/>Tools: Account Management<br/>Resources: Banking Products<br/>Prompts: Operation Templates]
+            ANALYTICS_MCP[Analytics MCP Server<br/>Tools: Report Generation<br/>Resources: Data Models<br/>Prompts: Analysis Templates]
+            COMPLIANCE_MCP[Compliance MCP Server<br/>Tools: Regulatory Checks<br/>Resources: Compliance Rules<br/>Prompts: Audit Templates]
         end
 
         subgraph KPS_INTEGRATION["KPS Integration Layer"]
@@ -418,8 +451,19 @@ graph TB
         end
     end
 
-    LANGGRAPH --> MCP_ROUTER
+    %% Agent to MCP Direct Connections (Key Missing Link!)
+    CRM_AGENT --> CRM_MCP
+    LENDING_AGENT --> LENDING_MCP
+    CREDIT_AGENT --> CREDIT_MCP
+    ANALYTICS_AGENT --> ANALYTICS_MCP
+    COMPLIANCE_AGENT --> COMPLIANCE_MCP
+    RISK_AGENT --> BANKING_MCP
 
+    %% LangGraph Orchestration
+    LANGGRAPH --> MCP_ORCHESTRATOR
+    MCP_ORCHESTRATOR --> MCP_ROUTER
+
+    %% MCP Router Management
     MCP_ROUTER --> MCP_REGISTRY
     MCP_ROUTER --> MCP_MONITOR
     MCP_ROUTER --> CRM_MCP
@@ -427,16 +471,21 @@ graph TB
     MCP_ROUTER --> CREDIT_MCP
     MCP_ROUTER --> BANKING_MCP
     MCP_ROUTER --> ANALYTICS_MCP
+    MCP_ROUTER --> COMPLIANCE_MCP
 
+    %% MCP to KPS Integration
     CRM_MCP --> API_GATEWAY
     LENDING_MCP --> API_GATEWAY
     CREDIT_MCP --> API_GATEWAY
     BANKING_MCP --> API_GATEWAY
     ANALYTICS_MCP --> API_GATEWAY
+    COMPLIANCE_MCP --> API_GATEWAY
 
+    %% KPS Processing
     API_GATEWAY --> DATA_PIPELINE
     DATA_PIPELINE --> ERROR_HANDLER
 
+    %% API Connections
     API_GATEWAY --> CRM_API
     API_GATEWAY --> ACCOUNT_API
     API_GATEWAY --> TRANSACTION_API
@@ -448,30 +497,86 @@ graph TB
     API_GATEWAY --> THIRD_PARTY_API
 ```
 
-### 4.2 MCP Server Specifications
+### 4.2 Agent-to-MCP Connection Architecture
 
-#### 4.2.1 CRM MCP Server
-- **Tools**: Customer lookup, profile updates, relationship data
-- **Resources**: Customer documents, interaction history
-- **Prompts**: Customer service templates, communication patterns
+#### 4.2.1 Direct Agent-MCP Connections
+Each banking agent maintains direct connections to its corresponding MCP server(s):
 
-#### 4.2.2 Lending MCP Server
-- **Tools**: Application processing, risk calculation, document verification
-- **Resources**: Loan products, underwriting guidelines
-- **Prompts**: Lending decision templates, risk assessment prompts
+**Connection Pattern:**
+- **CRM Agent** ↔ **CRM MCP Server**: Customer data operations
+- **Lending Agent** ↔ **Lending MCP Server**: Loan processing operations
+- **Credit Agent** ↔ **Credit MCP Server**: Credit scoring and risk assessment
+- **Analytics Agent** ↔ **Analytics MCP Server**: Reporting and insights
+- **Compliance Agent** ↔ **Compliance MCP Server**: Regulatory operations
+- **Risk Agent** ↔ **Banking MCP Server**: Risk management operations
 
-#### 4.2.3 Credit MCP Server
-- **Tools**: Credit scoring, limit management, fraud detection
-- **Resources**: Credit policies, risk models
-- **Prompts**: Credit decision templates, risk explanation prompts
+#### 4.2.2 MCP Server Specifications
 
-### 4.3 KPS Layer Integration
+**CRM MCP Server**
+- **Tools**: Customer lookup, profile updates, relationship data, interaction logging
+- **Resources**: Customer documents, interaction history, relationship maps
+- **Prompts**: Customer service templates, communication patterns, escalation guides
+
+**Lending MCP Server**
+- **Tools**: Application processing, risk calculation, document verification, underwriting
+- **Resources**: Loan products, underwriting guidelines, regulatory requirements
+- **Prompts**: Lending decision templates, risk assessment prompts, approval workflows
+
+**Credit MCP Server**
+- **Tools**: Credit scoring, limit management, fraud detection, bureau integration
+- **Resources**: Credit policies, risk models, fraud patterns
+- **Prompts**: Credit decision templates, risk explanation prompts, fraud alerts
+
+**Analytics MCP Server**
+- **Tools**: Report generation, data analysis, dashboard creation, KPI calculation
+- **Resources**: Data models, report templates, visualization configs
+- **Prompts**: Analysis templates, insight generation, trend identification
+
+**Compliance MCP Server**
+- **Tools**: Regulatory checks, audit trail generation, policy validation
+- **Resources**: Compliance rules, regulatory updates, audit templates
+- **Prompts**: Compliance verification, audit reporting, violation alerts
+
+**Banking Operations MCP Server**
+- **Tools**: Account management, transaction processing, balance inquiries
+- **Resources**: Banking products, transaction rules, account policies
+- **Prompts**: Operation templates, error handling, customer notifications
+
+### 4.3 Agent-MCP Communication Flow
+
+#### 4.3.1 Request Flow Pattern
+```mermaid
+sequenceDiagram
+    participant Agent as Banking Agent
+    participant MCP as MCP Server
+    participant KPS as KPS Gateway
+    participant API as Banking API
+
+    Agent->>MCP: MCP Request (Tools/Resources/Prompts)
+    MCP->>MCP: Validate Request & Context
+    MCP->>KPS: Transform to Banking API Call
+    KPS->>API: Execute Banking Operation
+    API-->>KPS: Banking Response
+    KPS->>MCP: Normalized Response
+    MCP->>MCP: Apply Business Logic & Formatting
+    MCP-->>Agent: Structured MCP Response
+```
+
+#### 4.3.2 Communication Benefits
+- **Protocol Standardization**: All agents use consistent MCP protocol
+- **Context Preservation**: Rich context maintained through MCP resources and prompts
+- **Error Handling**: Standardized error responses and retry mechanisms
+- **Security**: Authentication and authorization handled at MCP layer
+- **Monitoring**: Centralized logging and metrics collection
+
+### 4.4 KPS Layer Integration
 The KPS (Knowledge Processing System) layer provides:
-- Unified API gateway to banking systems
-- Data transformation and normalization
-- Rate limiting and throttling
-- Caching and performance optimization
-- Security and access control
+- **Unified API Gateway**: Single entry point to banking systems
+- **Data Transformation**: Normalization and enrichment of banking data
+- **Rate Limiting**: Throttling and quota management
+- **Caching Strategy**: Performance optimization with intelligent caching
+- **Security Control**: Authentication, authorization, and audit logging
+- **Circuit Breakers**: Fault tolerance and graceful degradation
 
 ## 5. Security & Compliance Architecture
 
