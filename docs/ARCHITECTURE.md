@@ -24,40 +24,66 @@ This document outlines the architecture for an enterprise-ready agentic orchestr
 
 ### 2.1 Layered Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                User Interface Layer                     │
-├─────────────────────────────────────────────────────────┤
-│              API Gateway & Security                     │
-├─────────────────────────────────────────────────────────┤
-│            Agentic Orchestration Layer                  │
-│  ┌─────────────────┐  ┌─────────────────────────────┐   │
-│  │ Supervisor/     │  │    Memory Systems           │   │
-│  │ Orchestrator    │  │  ┌─────────┐ ┌─────────────┐ │   │
-│  │ Agent           │  │  │   STM   │ │     LTM     │ │   │
-│  └─────────────────┘  │  └─────────┘ └─────────────┘ │   │
-│                       └─────────────────────────────────┘   │
-├─────────────────────────────────────────────────────────┤
-│              Specialized Banking Agents                 │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────────┐   │
-│  │   CRM   │ │Lending  │ │ Credit  │ │ Analytics   │   │
-│  │ Agent   │ │ Agent   │ │ Agent   │ │ Agent       │   │
-│  └─────────┘ └─────────┘ └─────────┘ └─────────────┘   │
-├─────────────────────────────────────────────────────────┤
-│              MCP Integration Framework                   │
-│  ┌─────────────────────────────────────────────────────┐ │
-│  │ MCP Router & Protocol Management                    │ │
-│  ├─────────┬─────────┬─────────┬─────────────────────┤ │
-│  │CRM MCP  │Lending  │Credit   │Banking MCP          │ │
-│  │Server   │MCP      │MCP      │Server               │ │
-│  └─────────┴─────────┴─────────┴─────────────────────┘ │
-├─────────────────────────────────────────────────────────┤
-│                 KPS Banking Layer                       │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────────┐   │
-│  │CRM APIs │ │Lending  │ │Credit   │ │Bank of APIs │   │
-│  │         │ │APIs     │ │APIs     │ │             │   │
-│  └─────────┘ └─────────┘ └─────────┘ └─────────────┘   │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph UI_LAYER ["User Interface Layer"]
+        UI[User Interface]
+        API_GW[API Gateway & Security]
+    end
+
+    subgraph ORCHESTRATION ["Agentic Orchestration Layer"]
+        SUPERVISOR[Supervisor/Orchestrator Agent]
+        subgraph MEMORY ["Memory Systems"]
+            STM[Short-Term Memory]
+            LTM[Long-Term Memory]
+        end
+    end
+
+    subgraph AGENTS ["Specialized Banking Agents"]
+        CRM_AGENT[CRM Agent]
+        LENDING_AGENT[Lending Agent]
+        CREDIT_AGENT[Credit Agent]
+        ANALYTICS_AGENT[Analytics Agent]
+    end
+
+    subgraph MCP_LAYER ["MCP Integration Framework"]
+        MCP_ROUTER[MCP Router & Protocol Management]
+        CRM_MCP[CRM MCP Server]
+        LENDING_MCP[Lending MCP Server]
+        CREDIT_MCP[Credit MCP Server]
+        BANKING_MCP[Banking MCP Server]
+    end
+
+    subgraph KPS_LAYER ["KPS Banking Layer"]
+        CRM_API[CRM APIs]
+        LENDING_API[Lending APIs]
+        CREDIT_API[Credit APIs]
+        BANK_API[Bank of APIs]
+    end
+
+    UI --> API_GW
+    API_GW --> SUPERVISOR
+    SUPERVISOR --> STM
+    SUPERVISOR --> LTM
+    SUPERVISOR --> CRM_AGENT
+    SUPERVISOR --> LENDING_AGENT
+    SUPERVISOR --> CREDIT_AGENT
+    SUPERVISOR --> ANALYTICS_AGENT
+
+    CRM_AGENT --> MCP_ROUTER
+    LENDING_AGENT --> MCP_ROUTER
+    CREDIT_AGENT --> MCP_ROUTER
+    ANALYTICS_AGENT --> MCP_ROUTER
+
+    MCP_ROUTER --> CRM_MCP
+    MCP_ROUTER --> LENDING_MCP
+    MCP_ROUTER --> CREDIT_MCP
+    MCP_ROUTER --> BANKING_MCP
+
+    CRM_MCP --> CRM_API
+    LENDING_MCP --> LENDING_API
+    CREDIT_MCP --> CREDIT_API
+    BANKING_MCP --> BANK_API
 ```
 
 ### 2.2 Component Interactions
@@ -95,41 +121,84 @@ This document outlines the architecture for an enterprise-ready agentic orchestr
 ### 3.2 Memory Systems Architecture
 
 #### 3.2.1 Short-Term Memory (STM)
-```
-STM Components:
-├── Session Context Store
-│   ├── User session data
-│   ├── Active conversation threads
-│   └── Temporary workflow state
-├── Reasoning Chain Cache
-│   ├── Agent decision logs
-│   ├── Intermediate results
-│   └── Error/retry history
-└── Context Window Manager
-    ├── Token usage optimization
-    ├── Context compression
-    └── Relevance scoring
+```mermaid
+flowchart TB
+    subgraph STM_LAYER ["Short-Term Memory (STM)"]
+        STM_MANAGER[STM Manager]
+
+        subgraph SESSION_STORE ["Session Context Store"]
+            USER_SESSION[User Session Data]
+            CONVERSATION[Active Conversation Threads]
+            WORKFLOW_STATE[Temporary Workflow State]
+        end
+
+        subgraph REASONING_CACHE ["Reasoning Chain Cache"]
+            DECISION_LOGS[Agent Decision Logs]
+            INTERMEDIATE[Intermediate Results]
+            ERROR_HISTORY[Error/Retry History]
+        end
+
+        subgraph CONTEXT_MGR ["Context Window Manager"]
+            TOKEN_OPT[Token Usage Optimization]
+            COMPRESSION[Context Compression]
+            RELEVANCE[Relevance Scoring]
+        end
+    end
+
+    STM_MANAGER --> USER_SESSION
+    STM_MANAGER --> CONVERSATION
+    STM_MANAGER --> WORKFLOW_STATE
+    STM_MANAGER --> DECISION_LOGS
+    STM_MANAGER --> INTERMEDIATE
+    STM_MANAGER --> ERROR_HISTORY
+    STM_MANAGER --> TOKEN_OPT
+    STM_MANAGER --> COMPRESSION
+    STM_MANAGER --> RELEVANCE
 ```
 
 #### 3.2.2 Long-Term Memory (LTM)
-```
-LTM Components:
-├── User Profile Store
-│   ├── Preferences and settings
-│   ├── Historical interaction patterns
-│   └── Risk profile and permissions
-├── Knowledge Base
-│   ├── Banking domain knowledge
-│   ├── Regulatory information
-│   └── Procedural documentation
-├── Audit and Compliance Store
-│   ├── Transaction logs
-│   ├── Decision audit trails
-│   └── Compliance verification records
-└── Analytics Store
-    ├── Performance metrics
-    ├── User behavior analytics
-    └── System optimization data
+```mermaid
+flowchart TB
+    subgraph LTM_LAYER ["Long-Term Memory (LTM)"]
+        LTM_MANAGER[LTM Manager]
+
+        subgraph USER_PROFILE ["User Profile Store"]
+            PREFERENCES[Preferences and Settings]
+            PATTERNS[Historical Interaction Patterns]
+            RISK_PROFILE[Risk Profile and Permissions]
+        end
+
+        subgraph KNOWLEDGE ["Knowledge Base"]
+            DOMAIN_KNOWLEDGE[Banking Domain Knowledge]
+            REGULATORY[Regulatory Information]
+            PROCEDURES[Procedural Documentation]
+        end
+
+        subgraph AUDIT_STORE ["Audit and Compliance Store"]
+            TRANSACTION_LOGS[Transaction Logs]
+            AUDIT_TRAILS[Decision Audit Trails]
+            COMPLIANCE_RECORDS[Compliance Verification Records]
+        end
+
+        subgraph ANALYTICS ["Analytics Store"]
+            PERFORMANCE[Performance Metrics]
+            BEHAVIOR[User Behavior Analytics]
+            OPTIMIZATION[System Optimization Data]
+        end
+    end
+
+    LTM_MANAGER --> PREFERENCES
+    LTM_MANAGER --> PATTERNS
+    LTM_MANAGER --> RISK_PROFILE
+    LTM_MANAGER --> DOMAIN_KNOWLEDGE
+    LTM_MANAGER --> REGULATORY
+    LTM_MANAGER --> PROCEDURES
+    LTM_MANAGER --> TRANSACTION_LOGS
+    LTM_MANAGER --> AUDIT_TRAILS
+    LTM_MANAGER --> COMPLIANCE_RECORDS
+    LTM_MANAGER --> PERFORMANCE
+    LTM_MANAGER --> BEHAVIOR
+    LTM_MANAGER --> OPTIMIZATION
 ```
 
 ### 3.3 Specialized Banking Agents
@@ -169,21 +238,46 @@ LTM Components:
 ### 4.1 MCP Architecture
 The Model Context Protocol (MCP) framework provides standardized interfaces for banking API integration:
 
-```
-MCP Framework:
-├── MCP Router
-│   ├── Protocol management
-│   ├── Load balancing
-│   └── Circuit breaker patterns
-├── Banking MCP Servers
-│   ├── CRM MCP Server
-│   ├── Lending MCP Server
-│   ├── Credit MCP Server
-│   └── Banking Operations MCP Server
-└── KPS Integration Layer
-    ├── API abstraction
-    ├── Data transformation
-    └── Error handling
+```mermaid
+flowchart TB
+    subgraph MCP_FRAMEWORK ["MCP Framework"]
+        MCP_ROUTER[MCP Router]
+
+        subgraph PROTOCOL ["Protocol Management"]
+            PROTOCOL_MGR[Protocol Management]
+            LOAD_BALANCER[Load Balancing]
+            CIRCUIT_BREAKER[Circuit Breaker Patterns]
+        end
+
+        subgraph MCP_SERVERS ["Banking MCP Servers"]
+            CRM_MCP[CRM MCP Server]
+            LENDING_MCP[Lending MCP Server]
+            CREDIT_MCP[Credit MCP Server]
+            BANKING_MCP[Banking Operations MCP Server]
+        end
+
+        subgraph KPS_INTEGRATION ["KPS Integration Layer"]
+            API_ABSTRACTION[API Abstraction]
+            DATA_TRANSFORM[Data Transformation]
+            ERROR_HANDLING[Error Handling]
+        end
+    end
+
+    MCP_ROUTER --> PROTOCOL_MGR
+    MCP_ROUTER --> LOAD_BALANCER
+    MCP_ROUTER --> CIRCUIT_BREAKER
+    MCP_ROUTER --> CRM_MCP
+    MCP_ROUTER --> LENDING_MCP
+    MCP_ROUTER --> CREDIT_MCP
+    MCP_ROUTER --> BANKING_MCP
+
+    CRM_MCP --> API_ABSTRACTION
+    LENDING_MCP --> API_ABSTRACTION
+    CREDIT_MCP --> API_ABSTRACTION
+    BANKING_MCP --> API_ABSTRACTION
+
+    API_ABSTRACTION --> DATA_TRANSFORM
+    API_ABSTRACTION --> ERROR_HANDLING
 ```
 
 ### 4.2 MCP Server Specifications
@@ -214,24 +308,42 @@ The KPS (Knowledge Processing System) layer provides:
 ## 5. Security & Compliance Architecture
 
 ### 5.1 Security Layers
-```
-Security Architecture:
-├── Authentication & Authorization
-│   ├── Multi-factor authentication
-│   ├── Role-based access control (RBAC)
-│   └── Attribute-based access control (ABAC)
-├── Data Protection
-│   ├── Encryption at rest and in transit
-│   ├── PII masking and tokenization
-│   └── Data loss prevention (DLP)
-├── Network Security
-│   ├── Zero-trust architecture
-│   ├── API security (OAuth 2.0, JWT)
-│   └── Network segmentation
-└── Monitoring & Compliance
-    ├── Real-time threat detection
-    ├── Audit logging and SIEM integration
-    └── Compliance reporting
+```mermaid
+flowchart TB
+    subgraph SECURITY ["Security Architecture"]
+        subgraph AUTH ["Authentication & Authorization"]
+            MFA[Multi-factor Authentication]
+            RBAC[Role-based Access Control]
+            ABAC[Attribute-based Access Control]
+        end
+
+        subgraph DATA_PROTECTION ["Data Protection"]
+            ENCRYPTION[Encryption at Rest and in Transit]
+            PII_MASKING[PII Masking and Tokenization]
+            DLP[Data Loss Prevention]
+        end
+
+        subgraph NETWORK ["Network Security"]
+            ZERO_TRUST[Zero-trust Architecture]
+            API_SECURITY[API Security - OAuth 2.0, JWT]
+            NETWORK_SEG[Network Segmentation]
+        end
+
+        subgraph MONITORING ["Monitoring & Compliance"]
+            THREAT_DETECTION[Real-time Threat Detection]
+            AUDIT_SIEM[Audit Logging and SIEM Integration]
+            COMPLIANCE_REPORT[Compliance Reporting]
+        end
+    end
+
+    MFA --> RBAC
+    RBAC --> ABAC
+    ENCRYPTION --> PII_MASKING
+    PII_MASKING --> DLP
+    ZERO_TRUST --> API_SECURITY
+    API_SECURITY --> NETWORK_SEG
+    THREAT_DETECTION --> AUDIT_SIEM
+    AUDIT_SIEM --> COMPLIANCE_REPORT
 ```
 
 ### 5.2 Regulatory Compliance
@@ -244,24 +356,40 @@ Security Architecture:
 ## 6. Human-in-the-Loop Design
 
 ### 6.1 Escalation Framework
-```
-Escalation Triggers:
-├── High-Risk Transactions
-│   ├── Large monetary amounts
-│   ├── Unusual patterns
-│   └── Regulatory flags
-├── Compliance Requirements
-│   ├── Manual approval workflows
-│   ├── Regulatory review
-│   └── Legal consultation
-├── System Uncertainty
-│   ├── Low confidence scores
-│   ├── Conflicting data
-│   └── Novel scenarios
-└── Customer Requests
-    ├── Complaint escalation
-    ├── Complex inquiries
-    └── VIP customer handling
+```mermaid
+flowchart TB
+    subgraph ESCALATION ["Escalation Triggers"]
+        subgraph HIGH_RISK ["High-Risk Transactions"]
+            LARGE_AMOUNTS[Large Monetary Amounts]
+            UNUSUAL_PATTERNS[Unusual Patterns]
+            REGULATORY_FLAGS[Regulatory Flags]
+        end
+
+        subgraph COMPLIANCE ["Compliance Requirements"]
+            MANUAL_APPROVAL[Manual Approval Workflows]
+            REGULATORY_REVIEW[Regulatory Review]
+            LEGAL_CONSULT[Legal Consultation]
+        end
+
+        subgraph UNCERTAINTY ["System Uncertainty"]
+            LOW_CONFIDENCE[Low Confidence Scores]
+            CONFLICTING_DATA[Conflicting Data]
+            NOVEL_SCENARIOS[Novel Scenarios]
+        end
+
+        subgraph CUSTOMER ["Customer Requests"]
+            COMPLAINT_ESC[Complaint Escalation]
+            COMPLEX_INQ[Complex Inquiries]
+            VIP_HANDLING[VIP Customer Handling]
+        end
+    end
+
+    LARGE_AMOUNTS --> MANUAL_APPROVAL
+    UNUSUAL_PATTERNS --> REGULATORY_REVIEW
+    REGULATORY_FLAGS --> LEGAL_CONSULT
+    LOW_CONFIDENCE --> COMPLAINT_ESC
+    CONFLICTING_DATA --> COMPLEX_INQ
+    NOVEL_SCENARIOS --> VIP_HANDLING
 ```
 
 ### 6.2 Expert Integration

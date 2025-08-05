@@ -6,33 +6,51 @@ This document outlines the complete project structure for the enterprise banking
 
 ## 1. Root Directory Structure
 
-```
-agentic-layer/
-├── README.md                           # Project overview and getting started
-├── ARCHITECTURE.md                     # High-level architecture documentation
-├── MEMORY_ARCHITECTURE.md              # Memory systems detailed design
-├── MCP_FRAMEWORK.md                    # MCP integration framework design
-├── AGENT_ORCHESTRATION.md              # Multi-agent orchestration design
-├── SECURITY_COMPLIANCE.md              # Security and compliance architecture
-├── DEPLOYMENT.md                       # Deployment and operations guide
-├── CONTRIBUTING.md                     # Development guidelines
-├── LICENSE                             # License information
-├── .gitignore                          # Git ignore patterns
-├── .env.example                        # Environment variables template
-├── docker-compose.yml                  # Local development setup
-├── Dockerfile                          # Container definition
-├── requirements.txt                    # Python dependencies
-├── pyproject.toml                      # Python project configuration
-├── Makefile                            # Build and development commands
-└── .github/                            # GitHub workflows and templates
-    ├── workflows/
-    │   ├── ci.yml                      # Continuous integration
-    │   ├── cd.yml                      # Continuous deployment
-    │   └── security.yml                # Security scanning
-    └── ISSUE_TEMPLATE/
-        ├── bug_report.md
-        ├── feature_request.md
-        └── security_issue.md
+```mermaid
+graph TB
+    subgraph "agentic-layer/"
+        README[README.md - Project overview]
+        ARCH[ARCHITECTURE.md - High-level architecture]
+        MEMORY[MEMORY_ARCHITECTURE.md - Memory systems design]
+        MCP[MCP_FRAMEWORK.md - MCP integration design]
+        AGENT[AGENT_ORCHESTRATION.md - Multi-agent design]
+        SECURITY[SECURITY_COMPLIANCE.md - Security architecture]
+        DEPLOY[DEPLOYMENT.md - Deployment guide]
+        CONTRIB[CONTRIBUTING.md - Development guidelines]
+        LICENSE[LICENSE - License information]
+        GITIGNORE[.gitignore - Git ignore patterns]
+        ENV[.env.example - Environment template]
+        DOCKER_COMPOSE[docker-compose.yml - Local development]
+        DOCKERFILE[Dockerfile - Container definition]
+        REQUIREMENTS[requirements.txt - Python dependencies]
+        PYPROJECT[pyproject.toml - Python project config]
+        MAKEFILE[Makefile - Build commands]
+
+        subgraph ".github/"
+            subgraph "workflows/"
+                CI[ci.yml - Continuous integration]
+                CD[cd.yml - Continuous deployment]
+                SEC[security.yml - Security scanning]
+            end
+
+            subgraph "ISSUE_TEMPLATE/"
+                BUG[bug_report.md]
+                FEATURE[feature_request.md]
+                SEC_ISSUE[security_issue.md]
+            end
+        end
+    end
+
+    README --> ARCH
+    ARCH --> MEMORY
+    MEMORY --> MCP
+    MCP --> AGENT
+    AGENT --> SECURITY
+    SECURITY --> DEPLOY
+    CI --> CD
+    CD --> SEC
+    BUG --> FEATURE
+    FEATURE --> SEC_ISSUE
 ```
 
 ## 2. Source Code Structure

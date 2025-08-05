@@ -9,65 +9,119 @@ The Multi-Agent Orchestration system provides intelligent coordination between s
 ### 1.1 Core Architecture
 
 #### Supervisor Agent Components
-```
-Supervisor Agent:
-├── Intent Analysis Engine
-│   ├── Natural language understanding
-│   ├── Banking domain classification
-│   ├── Multi-intent detection
-│   └── Context-aware interpretation
-├── Workflow Manager
-│   ├── Multi-step process orchestration
-│   ├── State management
-│   ├── Error handling and recovery
-│   └── Parallel task coordination
-├── Context Manager
-│   ├── Session context maintenance
-│   ├── Cross-agent context sharing
-│   ├── Memory system integration
-│   └── Context compression and optimization
-├── Response Aggregator
-│   ├── Multi-agent response synthesis
-│   ├── Conflict resolution
-│   ├── Response prioritization
-│   └── Quality assurance
-└── Quality Controller
-    ├── Response validation
-    ├── Compliance checking
-    ├── Risk assessment
-    └── Performance monitoring
+```mermaid
+graph TB
+    subgraph "Supervisor Agent"
+        subgraph "Intent Analysis Engine"
+            NLU[Natural Language Understanding]
+            BANKING_CLASS[Banking Domain Classification]
+            MULTI_INTENT[Multi-intent Detection]
+            CONTEXT_INTERP[Context-aware Interpretation]
+        end
+
+        subgraph "Workflow Manager"
+            PROCESS_ORCH[Multi-step Process Orchestration]
+            STATE_MGR[State Management]
+            ERROR_RECOVERY[Error Handling and Recovery]
+            PARALLEL_COORD[Parallel Task Coordination]
+        end
+
+        subgraph "Context Manager"
+            SESSION_MAINT[Session Context Maintenance]
+            CROSS_AGENT[Cross-agent Context Sharing]
+            MEMORY_INTEG[Memory System Integration]
+            CONTEXT_OPT[Context Compression and Optimization]
+        end
+
+        subgraph "Response Aggregator"
+            RESPONSE_SYNTH[Multi-agent Response Synthesis]
+            CONFLICT_RES[Conflict Resolution]
+            RESPONSE_PRIOR[Response Prioritization]
+            QUALITY_ASSUR[Quality Assurance]
+        end
+
+        subgraph "Quality Controller"
+            RESPONSE_VAL[Response Validation]
+            COMPLIANCE_CHECK[Compliance Checking]
+            RISK_ASSESS[Risk Assessment]
+            PERF_MONITOR[Performance Monitoring]
+        end
+    end
+
+    NLU --> BANKING_CLASS
+    BANKING_CLASS --> MULTI_INTENT
+    MULTI_INTENT --> CONTEXT_INTERP
+    PROCESS_ORCH --> STATE_MGR
+    STATE_MGR --> ERROR_RECOVERY
+    ERROR_RECOVERY --> PARALLEL_COORD
+    SESSION_MAINT --> CROSS_AGENT
+    CROSS_AGENT --> MEMORY_INTEG
+    MEMORY_INTEG --> CONTEXT_OPT
+    RESPONSE_SYNTH --> CONFLICT_RES
+    CONFLICT_RES --> RESPONSE_PRIOR
+    RESPONSE_PRIOR --> QUALITY_ASSUR
+    RESPONSE_VAL --> COMPLIANCE_CHECK
+    COMPLIANCE_CHECK --> RISK_ASSESS
+    RISK_ASSESS --> PERF_MONITOR
 ```
 
 ### 1.2 Intent Analysis Engine
 
 #### Banking Intent Classification
-```
-Intent Categories:
-├── Account Management
-│   ├── Balance inquiries
-│   ├── Transaction history
-│   ├── Account modifications
-│   └── Service requests
-├── Lending Operations
-│   ├── Loan applications
-│   ├── Credit assessments
-│   ├── Payment processing
-│   └── Refinancing requests
-├── Investment Services
-│   ├── Portfolio management
-│   ├── Investment advice
-│   ├── Risk assessment
-│   └── Performance analysis
-├── Customer Service
-│   ├── General inquiries
-│   ├── Complaint resolution
-│   ├── Product information
-│   └── Technical support
-└── Compliance & Risk
-    ├── Regulatory inquiries
-    ├── Risk assessments
-    ├── Audit requests
-    └── Fraud detection
+```mermaid
+graph TB
+    subgraph "Intent Categories"
+        subgraph "Account Management"
+            BALANCE_INQ[Balance Inquiries]
+            TRANSACTION_HIST[Transaction History]
+            ACCOUNT_MOD[Account Modifications]
+            SERVICE_REQ[Service Requests]
+        end
+
+        subgraph "Lending Operations"
+            LOAN_APP[Loan Applications]
+            CREDIT_ASSESS[Credit Assessments]
+            PAYMENT_PROC[Payment Processing]
+            REFINANCE[Refinancing Requests]
+        end
+
+        subgraph "Investment Services"
+            PORTFOLIO_MGR[Portfolio Management]
+            INVESTMENT_ADV[Investment Advice]
+            RISK_ASSESS[Risk Assessment]
+            PERF_ANALYSIS[Performance Analysis]
+        end
+
+        subgraph "Customer Service"
+            GENERAL_INQ[General Inquiries]
+            COMPLAINT_RES[Complaint Resolution]
+            PRODUCT_INFO[Product Information]
+            TECH_SUPPORT[Technical Support]
+        end
+
+        subgraph "Compliance & Risk"
+            REGULATORY_INQ[Regulatory Inquiries]
+            RISK_ASSESSMENTS[Risk Assessments]
+            AUDIT_REQ[Audit Requests]
+            FRAUD_DETECT[Fraud Detection]
+        end
+    end
+
+    BALANCE_INQ --> TRANSACTION_HIST
+    TRANSACTION_HIST --> ACCOUNT_MOD
+    ACCOUNT_MOD --> SERVICE_REQ
+    LOAN_APP --> CREDIT_ASSESS
+    CREDIT_ASSESS --> PAYMENT_PROC
+    PAYMENT_PROC --> REFINANCE
+    PORTFOLIO_MGR --> INVESTMENT_ADV
+    INVESTMENT_ADV --> RISK_ASSESS
+    RISK_ASSESS --> PERF_ANALYSIS
+    GENERAL_INQ --> COMPLAINT_RES
+    COMPLAINT_RES --> PRODUCT_INFO
+    PRODUCT_INFO --> TECH_SUPPORT
+    REGULATORY_INQ --> RISK_ASSESSMENTS
+    RISK_ASSESSMENTS --> AUDIT_REQ
+    AUDIT_REQ --> FRAUD_DETECT
 ```
 
 #### Intent Processing Pipeline

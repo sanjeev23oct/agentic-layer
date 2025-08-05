@@ -9,53 +9,97 @@ The Model Context Protocol (MCP) Integration Framework provides a standardized, 
 ### 1.1 Core Components
 
 #### MCP Router & Load Balancer
-```
-MCP Router Features:
-├── Intelligent Routing
-│   ├── Agent-to-MCP server mapping
-│   ├── Load balancing algorithms
-│   ├── Failover mechanisms
-│   └── Health-based routing
-├── Protocol Management
-│   ├── MCP protocol validation
-│   ├── Version compatibility
-│   ├── Message serialization
-│   └── Error handling
-├── Performance Optimization
-│   ├── Connection pooling
-│   ├── Request batching
-│   ├── Response caching
-│   └── Compression
-└── Security Integration
-    ├── Authentication forwarding
-    ├── Authorization enforcement
-    ├── Audit logging
-    └── Rate limiting
+```mermaid
+graph TB
+    subgraph "MCP Router Features"
+        subgraph "Intelligent Routing"
+            AGENT_MAPPING[Agent-to-MCP Server Mapping]
+            LOAD_BALANCING[Load Balancing Algorithms]
+            FAILOVER[Failover Mechanisms]
+            HEALTH_ROUTING[Health-based Routing]
+        end
+
+        subgraph "Protocol Management"
+            PROTOCOL_VALIDATION[MCP Protocol Validation]
+            VERSION_COMPAT[Version Compatibility]
+            MESSAGE_SERIAL[Message Serialization]
+            ERROR_HANDLING[Error Handling]
+        end
+
+        subgraph "Performance Optimization"
+            CONNECTION_POOL[Connection Pooling]
+            REQUEST_BATCH[Request Batching]
+            RESPONSE_CACHE[Response Caching]
+            COMPRESSION[Compression]
+        end
+
+        subgraph "Security Integration"
+            AUTH_FORWARD[Authentication Forwarding]
+            AUTHZ_ENFORCE[Authorization Enforcement]
+            AUDIT_LOG[Audit Logging]
+            RATE_LIMIT[Rate Limiting]
+        end
+    end
+
+    AGENT_MAPPING --> LOAD_BALANCING
+    LOAD_BALANCING --> FAILOVER
+    FAILOVER --> HEALTH_ROUTING
+    PROTOCOL_VALIDATION --> VERSION_COMPAT
+    VERSION_COMPAT --> MESSAGE_SERIAL
+    MESSAGE_SERIAL --> ERROR_HANDLING
+    CONNECTION_POOL --> REQUEST_BATCH
+    REQUEST_BATCH --> RESPONSE_CACHE
+    RESPONSE_CACHE --> COMPRESSION
+    AUTH_FORWARD --> AUTHZ_ENFORCE
+    AUTHZ_ENFORCE --> AUDIT_LOG
+    AUDIT_LOG --> RATE_LIMIT
 ```
 
 #### MCP Server Registry
-```
-Registry Components:
-├── Service Discovery
-│   ├── Dynamic server registration
-│   ├── Health status tracking
-│   ├── Capability advertisement
-│   └── Version management
-├── Configuration Management
-│   ├── Server configurations
-│   ├── Routing rules
-│   ├── Load balancing policies
-│   └── Circuit breaker settings
-├── Metadata Management
-│   ├── API documentation
-│   ├── Schema definitions
-│   ├── Performance metrics
-│   └── Dependency mapping
-└── Lifecycle Management
-    ├── Server deployment
-    ├── Rolling updates
-    ├── Graceful shutdown
-    └── Cleanup procedures
+```mermaid
+graph TB
+    subgraph "Registry Components"
+        subgraph "Service Discovery"
+            DYNAMIC_REG[Dynamic Server Registration]
+            HEALTH_TRACKING[Health Status Tracking]
+            CAPABILITY_ADV[Capability Advertisement]
+            VERSION_MGR[Version Management]
+        end
+
+        subgraph "Configuration Management"
+            SERVER_CONFIG[Server Configurations]
+            ROUTING_RULES[Routing Rules]
+            LB_POLICIES[Load Balancing Policies]
+            CB_SETTINGS[Circuit Breaker Settings]
+        end
+
+        subgraph "Metadata Management"
+            API_DOCS[API Documentation]
+            SCHEMA_DEF[Schema Definitions]
+            PERF_METRICS[Performance Metrics]
+            DEPENDENCY_MAP[Dependency Mapping]
+        end
+
+        subgraph "Lifecycle Management"
+            SERVER_DEPLOY[Server Deployment]
+            ROLLING_UPDATES[Rolling Updates]
+            GRACEFUL_SHUTDOWN[Graceful Shutdown]
+            CLEANUP_PROC[Cleanup Procedures]
+        end
+    end
+
+    DYNAMIC_REG --> HEALTH_TRACKING
+    HEALTH_TRACKING --> CAPABILITY_ADV
+    CAPABILITY_ADV --> VERSION_MGR
+    SERVER_CONFIG --> ROUTING_RULES
+    ROUTING_RULES --> LB_POLICIES
+    LB_POLICIES --> CB_SETTINGS
+    API_DOCS --> SCHEMA_DEF
+    SCHEMA_DEF --> PERF_METRICS
+    PERF_METRICS --> DEPENDENCY_MAP
+    SERVER_DEPLOY --> ROLLING_UPDATES
+    ROLLING_UPDATES --> GRACEFUL_SHUTDOWN
+    GRACEFUL_SHUTDOWN --> CLEANUP_PROC
 ```
 
 ### 1.2 Circuit Breaker Pattern

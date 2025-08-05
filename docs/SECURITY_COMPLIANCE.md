@@ -8,64 +8,123 @@ The Security & Compliance Architecture provides comprehensive protection for the
 
 ### 1.1 Defense-in-Depth Model
 
-```
-Security Layers (Outside to Inside):
-├── Perimeter Security
-│   ├── Web Application Firewall (WAF)
-│   ├── DDoS protection
-│   ├── Network firewalls
-│   └── Intrusion detection/prevention
-├── Network Security
-│   ├── Zero-trust architecture
-│   ├── Network segmentation
-│   ├── VPN and secure tunnels
-│   └── Traffic encryption
-├── Application Security
-│   ├── API security (OAuth 2.0, JWT)
-│   ├── Input validation and sanitization
-│   ├── Output encoding
-│   └── Secure coding practices
-├── Data Security
-│   ├── Encryption at rest and in transit
-│   ├── Data classification and labeling
-│   ├── Data loss prevention (DLP)
-│   └── Database security
-├── Identity & Access Management
-│   ├── Multi-factor authentication (MFA)
-│   ├── Role-based access control (RBAC)
-│   ├── Attribute-based access control (ABAC)
-│   └── Privileged access management (PAM)
-└── Monitoring & Response
-    ├── Security information and event management (SIEM)
-    ├── Security orchestration and automated response (SOAR)
-    ├── Threat intelligence
-    └── Incident response
+```mermaid
+graph TB
+    subgraph "Defense-in-Depth Security Layers"
+        subgraph "Perimeter Security"
+            WAF[Web Application Firewall]
+            DDOS[DDoS Protection]
+            FIREWALLS[Network Firewalls]
+            IDS_IPS[Intrusion Detection/Prevention]
+        end
+
+        subgraph "Network Security"
+            ZERO_TRUST[Zero-trust Architecture]
+            NET_SEG[Network Segmentation]
+            VPN[VPN and Secure Tunnels]
+            TRAFFIC_ENC[Traffic Encryption]
+        end
+
+        subgraph "Application Security"
+            API_SEC[API Security - OAuth 2.0, JWT]
+            INPUT_VAL[Input Validation and Sanitization]
+            OUTPUT_ENC[Output Encoding]
+            SECURE_CODE[Secure Coding Practices]
+        end
+
+        subgraph "Data Security"
+            ENCRYPTION[Encryption at Rest and in Transit]
+            DATA_CLASS[Data Classification and Labeling]
+            DLP[Data Loss Prevention]
+            DB_SEC[Database Security]
+        end
+
+        subgraph "Identity & Access Management"
+            MFA[Multi-factor Authentication]
+            RBAC[Role-based Access Control]
+            ABAC[Attribute-based Access Control]
+            PAM[Privileged Access Management]
+        end
+
+        subgraph "Monitoring & Response"
+            SIEM[Security Information and Event Management]
+            SOAR[Security Orchestration and Automated Response]
+            THREAT_INTEL[Threat Intelligence]
+            INCIDENT_RESP[Incident Response]
+        end
+    end
+
+    WAF --> DDOS
+    DDOS --> FIREWALLS
+    FIREWALLS --> IDS_IPS
+    IDS_IPS --> ZERO_TRUST
+    ZERO_TRUST --> NET_SEG
+    NET_SEG --> VPN
+    VPN --> TRAFFIC_ENC
+    TRAFFIC_ENC --> API_SEC
+    API_SEC --> INPUT_VAL
+    INPUT_VAL --> OUTPUT_ENC
+    OUTPUT_ENC --> SECURE_CODE
+    SECURE_CODE --> ENCRYPTION
+    ENCRYPTION --> DATA_CLASS
+    DATA_CLASS --> DLP
+    DLP --> DB_SEC
+    DB_SEC --> MFA
+    MFA --> RBAC
+    RBAC --> ABAC
+    ABAC --> PAM
+    PAM --> SIEM
+    SIEM --> SOAR
+    SOAR --> THREAT_INTEL
+    THREAT_INTEL --> INCIDENT_RESP
 ```
 
 ### 1.2 Zero-Trust Architecture
 
-```
-Zero-Trust Principles:
-├── Never Trust, Always Verify
-│   ├── Continuous authentication
-│   ├── Device verification
-│   ├── Location validation
-│   └── Behavioral analysis
-├── Least Privilege Access
-│   ├── Minimal access rights
-│   ├── Just-in-time access
-│   ├── Time-limited permissions
-│   └── Regular access reviews
-├── Assume Breach
-│   ├── Lateral movement prevention
-│   ├── Micro-segmentation
-│   ├── Continuous monitoring
-│   └── Rapid incident response
-└── Verify Explicitly
-    ├── Multi-factor authentication
-    ├── Device compliance
-    ├── Risk-based authentication
-    └── Continuous validation
+```mermaid
+graph TB
+    subgraph "Zero-Trust Principles"
+        subgraph "Never Trust, Always Verify"
+            CONTINUOUS_AUTH[Continuous Authentication]
+            DEVICE_VERIFY[Device Verification]
+            LOCATION_VAL[Location Validation]
+            BEHAVIORAL[Behavioral Analysis]
+        end
+
+        subgraph "Least Privilege Access"
+            MINIMAL_ACCESS[Minimal Access Rights]
+            JIT_ACCESS[Just-in-time Access]
+            TIME_LIMITED[Time-limited Permissions]
+            ACCESS_REVIEWS[Regular Access Reviews]
+        end
+
+        subgraph "Assume Breach"
+            LATERAL_PREVENT[Lateral Movement Prevention]
+            MICRO_SEG[Micro-segmentation]
+            CONTINUOUS_MON[Continuous Monitoring]
+            RAPID_RESPONSE[Rapid Incident Response]
+        end
+
+        subgraph "Verify Explicitly"
+            MFA_VERIFY[Multi-factor Authentication]
+            DEVICE_COMPLIANCE[Device Compliance]
+            RISK_AUTH[Risk-based Authentication]
+            CONTINUOUS_VAL[Continuous Validation]
+        end
+    end
+
+    CONTINUOUS_AUTH --> DEVICE_VERIFY
+    DEVICE_VERIFY --> LOCATION_VAL
+    LOCATION_VAL --> BEHAVIORAL
+    MINIMAL_ACCESS --> JIT_ACCESS
+    JIT_ACCESS --> TIME_LIMITED
+    TIME_LIMITED --> ACCESS_REVIEWS
+    LATERAL_PREVENT --> MICRO_SEG
+    MICRO_SEG --> CONTINUOUS_MON
+    CONTINUOUS_MON --> RAPID_RESPONSE
+    MFA_VERIFY --> DEVICE_COMPLIANCE
+    DEVICE_COMPLIANCE --> RISK_AUTH
+    RISK_AUTH --> CONTINUOUS_VAL
 ```
 
 ## 2. Authentication & Authorization

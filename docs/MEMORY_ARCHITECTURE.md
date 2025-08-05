@@ -9,63 +9,114 @@ The memory systems form the cognitive backbone of the banking agentic layer, pro
 ### 1.1 STM Components
 
 #### Session Context Store
-```
-Session Context Structure:
-├── User Session Data
-│   ├── Authentication context
-│   ├── Role and permissions
-│   ├── Current banking products/accounts
-│   └── Session preferences
-├── Conversation Thread
-│   ├── Message history (last 50 messages)
-│   ├── Intent progression
-│   ├── Context switches
-│   └── Unresolved queries
-└── Active Workflow State
-    ├── Multi-step transaction state
-    ├── Approval workflow status
-    ├── Document collection progress
-    └── Risk assessment state
+```mermaid
+graph TB
+    subgraph "Session Context Structure"
+        subgraph "User Session Data"
+            AUTH_CONTEXT[Authentication Context]
+            ROLE_PERMS[Role and Permissions]
+            BANKING_PRODUCTS[Current Banking Products/Accounts]
+            SESSION_PREFS[Session Preferences]
+        end
+
+        subgraph "Conversation Thread"
+            MESSAGE_HISTORY[Message History - Last 50 Messages]
+            INTENT_PROGRESSION[Intent Progression]
+            CONTEXT_SWITCHES[Context Switches]
+            UNRESOLVED[Unresolved Queries]
+        end
+
+        subgraph "Active Workflow State"
+            TRANSACTION_STATE[Multi-step Transaction State]
+            APPROVAL_STATUS[Approval Workflow Status]
+            DOCUMENT_PROGRESS[Document Collection Progress]
+            RISK_STATE[Risk Assessment State]
+        end
+    end
+
+    AUTH_CONTEXT --> ROLE_PERMS
+    ROLE_PERMS --> BANKING_PRODUCTS
+    BANKING_PRODUCTS --> SESSION_PREFS
+    MESSAGE_HISTORY --> INTENT_PROGRESSION
+    INTENT_PROGRESSION --> CONTEXT_SWITCHES
+    CONTEXT_SWITCHES --> UNRESOLVED
+    TRANSACTION_STATE --> APPROVAL_STATUS
+    APPROVAL_STATUS --> DOCUMENT_PROGRESS
+    DOCUMENT_PROGRESS --> RISK_STATE
 ```
 
 #### Reasoning Chain Cache
-```
-Reasoning Chain Structure:
-├── Agent Decision Logs
-│   ├── Decision rationale
-│   ├── Confidence scores
-│   ├── Alternative options considered
-│   └── Risk factors identified
-├── Intermediate Results
-│   ├── API call responses
-│   ├── Calculated values
-│   ├── Validation results
-│   └── Transformation outputs
-└── Error and Retry History
-    ├── Failed operations
-    ├── Retry attempts
-    ├── Fallback strategies
-    └── Recovery actions
+```mermaid
+graph TB
+    subgraph "Reasoning Chain Structure"
+        subgraph "Agent Decision Logs"
+            DECISION_RATIONALE[Decision Rationale]
+            CONFIDENCE_SCORES[Confidence Scores]
+            ALTERNATIVES[Alternative Options Considered]
+            RISK_FACTORS[Risk Factors Identified]
+        end
+
+        subgraph "Intermediate Results"
+            API_RESPONSES[API Call Responses]
+            CALCULATED_VALUES[Calculated Values]
+            VALIDATION_RESULTS[Validation Results]
+            TRANSFORM_OUTPUTS[Transformation Outputs]
+        end
+
+        subgraph "Error and Retry History"
+            FAILED_OPS[Failed Operations]
+            RETRY_ATTEMPTS[Retry Attempts]
+            FALLBACK_STRATEGIES[Fallback Strategies]
+            RECOVERY_ACTIONS[Recovery Actions]
+        end
+    end
+
+    DECISION_RATIONALE --> CONFIDENCE_SCORES
+    CONFIDENCE_SCORES --> ALTERNATIVES
+    ALTERNATIVES --> RISK_FACTORS
+    API_RESPONSES --> CALCULATED_VALUES
+    CALCULATED_VALUES --> VALIDATION_RESULTS
+    VALIDATION_RESULTS --> TRANSFORM_OUTPUTS
+    FAILED_OPS --> RETRY_ATTEMPTS
+    RETRY_ATTEMPTS --> FALLBACK_STRATEGIES
+    FALLBACK_STRATEGIES --> RECOVERY_ACTIONS
 ```
 
 #### Context Window Manager
-```
-Context Management Features:
-├── Token Usage Optimization
-│   ├── Dynamic context pruning
-│   ├── Relevance-based filtering
-│   ├── Compression algorithms
-│   └── Priority-based retention
-├── Context Compression
-│   ├── Summarization of old context
-│   ├── Key information extraction
-│   ├── Semantic clustering
-│   └── Lossy compression strategies
-└── Relevance Scoring
-    ├── Temporal relevance decay
-    ├── Topic relevance scoring
-    ├── User preference weighting
-    └── Business priority factors
+```mermaid
+graph TB
+    subgraph "Context Management Features"
+        subgraph "Token Usage Optimization"
+            DYNAMIC_PRUNING[Dynamic Context Pruning]
+            RELEVANCE_FILTER[Relevance-based Filtering]
+            COMPRESSION_ALGO[Compression Algorithms]
+            PRIORITY_RETENTION[Priority-based Retention]
+        end
+
+        subgraph "Context Compression"
+            SUMMARIZATION[Summarization of Old Context]
+            KEY_EXTRACTION[Key Information Extraction]
+            SEMANTIC_CLUSTER[Semantic Clustering]
+            LOSSY_COMPRESSION[Lossy Compression Strategies]
+        end
+
+        subgraph "Relevance Scoring"
+            TEMPORAL_DECAY[Temporal Relevance Decay]
+            TOPIC_SCORING[Topic Relevance Scoring]
+            USER_WEIGHTING[User Preference Weighting]
+            BUSINESS_PRIORITY[Business Priority Factors]
+        end
+    end
+
+    DYNAMIC_PRUNING --> RELEVANCE_FILTER
+    RELEVANCE_FILTER --> COMPRESSION_ALGO
+    COMPRESSION_ALGO --> PRIORITY_RETENTION
+    SUMMARIZATION --> KEY_EXTRACTION
+    KEY_EXTRACTION --> SEMANTIC_CLUSTER
+    SEMANTIC_CLUSTER --> LOSSY_COMPRESSION
+    TEMPORAL_DECAY --> TOPIC_SCORING
+    TOPIC_SCORING --> USER_WEIGHTING
+    USER_WEIGHTING --> BUSINESS_PRIORITY
 ```
 
 ### 1.2 STM Performance Characteristics
