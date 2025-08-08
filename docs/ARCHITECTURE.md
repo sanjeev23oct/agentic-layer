@@ -25,115 +25,111 @@ This document outlines the architecture for an enterprise-ready agentic orchestr
 ### 2.1 Enterprise Banking Agentic Architecture
 
 ```mermaid
-graph TB
-    subgraph UI["User Interface Layer"]
-        USER[Banking User Interface]
-        GATEWAY[API Gateway & Security]
+graph TD
+  subgraph UI
+    USER[User Interface]
+    GATEWAY[API Gateway]
+  end
+
+  subgraph AGENTIC
+    SUPERVISOR[Supervisor]
+    subgraph LANGGRAPH
+      PLANNER[Planner]
+      STATE[State]
+      EXECUTOR[Executor]
     end
-
-    subgraph AGENTIC["Agentic Orchestration Layer"]
-        SUPERVISOR[Supervisor Agent]
-
-        subgraph LANGGRAPH["LangGraph Engine"]
-            PLANNER[Workflow Planner]
-            STATE[State Manager]
-            EXECUTOR[Execution Engine]
-        end
-
-        subgraph MEMORY["Memory Systems"]
-            STM[Short-Term Memory]
-            LTM[Long-Term Memory]
-            BRIDGE[Memory Bridge]
-        end
-
-        subgraph MCP_CORE["MCP Core"]
-            ROUTER[MCP Router]
-            REGISTRY[Server Registry]
-            MONITOR[Health Monitor]
-        end
+    subgraph MEMORY
+      STM[Short-Term Memory]
+      BRIDGE[Memory Bridge]
+      LTM[Long-Term Memory]
     end
-
-    subgraph AGENTS["Banking Agents"]
-        CRM[CRM Agent]
-        LENDING[Lending Agent]
-        CREDIT[Credit Agent]
-        ANALYTICS[Analytics Agent]
-        COMPLIANCE[Compliance Agent]
-        RISK[Risk Agent]
+    subgraph MCP_CORE
+      ROUTER[MCP Router]
+      REGISTRY[Server Registry]
+      MONITOR[Health Monitor]
     end
-
-    subgraph MCP_SERVERS["MCP Servers"]
-        CRM_MCP[CRM MCP Server]
-        LENDING_MCP[Lending MCP Server]
-        CREDIT_MCP[Credit MCP Server]
-        BANKING_MCP[Banking MCP Server]
-        ANALYTICS_MCP[Analytics MCP Server]
-        COMPLIANCE_MCP[Compliance MCP Server]
+    subgraph GUARDRAILS
+      POLICY[Policy Enforcement]
+      PII[PII Redaction]
+      RISK_CTRL[Risk Controls]
     end
+  end
 
-    subgraph KPS["KPS Banking Layer"]
-        CRM_API[CRM APIs]
-        LENDING_API[Lending APIs]
-        CREDIT_API[Credit APIs]
-        BANKING_API[Banking APIs]
-        ANALYTICS_API[Analytics APIs]
-        COMPLIANCE_API[Compliance APIs]
-    end
+  subgraph AGENTS
+    CRM[CRM Agent]
+    LENDING[Lending Agent]
+    CREDIT[Credit Agent]
+    ANALYTICS[Analytics Agent]
+    COMPLIANCE[Compliance Agent]
+    RISK[Risk Agent]
+  end
 
-    subgraph HUMAN["Human-in-the-Loop"]
-        EXPERTS[Banking Experts]
-        COMPLIANCE_TEAM[Compliance Team]
-    end
+  subgraph MCP_SERVERS
+    CRM_MCP[CRM MCP]
+    LENDING_MCP[Lending MCP]
+    CREDIT_MCP[Credit MCP]
+    BANKING_MCP[Banking MCP]
+    ANALYTICS_MCP[Analytics MCP]
+    COMPLIANCE_MCP[Compliance MCP]
+    RISK_MCP[Risk MCP]
+  end
 
-    %% User Flow
-    USER --> GATEWAY
-    GATEWAY --> SUPERVISOR
-    SUPERVISOR --> PLANNER
-    SUPERVISOR --> MEMORY
-    SUPERVISOR --> ROUTER
+  subgraph KPS
+    CRM_API[CRM APIs]
+    LENDING_API[Lending APIs]
+    CREDIT_API[Credit APIs]
+    BANKING_API[Banking APIs]
+    ANALYTICS_API[Analytics APIs]
+    COMPLIANCE_API[Compliance APIs]
+    RISK_API[Risk APIs]
+  end
 
-    %% LangGraph Flow
-    PLANNER --> STATE
-    STATE --> EXECUTOR
-    STM --> BRIDGE
-    BRIDGE --> LTM
+  subgraph HUMAN
+    EXPERTS[Experts]
+    COMPLIANCE_TEAM[Compliance Team]
+  end
 
-    %% Agent Orchestration
-    EXECUTOR --> CRM
-    EXECUTOR --> LENDING
-    EXECUTOR --> CREDIT
-    EXECUTOR --> ANALYTICS
-    EXECUTOR --> COMPLIANCE
-    EXECUTOR --> RISK
+  USER --> GATEWAY --> SUPERVISOR
+  SUPERVISOR --> PLANNER --> STATE --> EXECUTOR
+  SUPERVISOR --> STM
+  STM --> BRIDGE --> LTM
+  SUPERVISOR --> ROUTER
+  SUPERVISOR --> POLICY
+  SUPERVISOR --> PII
+  SUPERVISOR --> RISK_CTRL
 
-    %% Critical: Agent to MCP Direct Connections
-    CRM --> CRM_MCP
-    LENDING --> LENDING_MCP
-    CREDIT --> CREDIT_MCP
-    ANALYTICS --> ANALYTICS_MCP
-    COMPLIANCE --> COMPLIANCE_MCP
-    RISK --> BANKING_MCP
+  EXECUTOR --> CRM
+  EXECUTOR --> LENDING
+  EXECUTOR --> CREDIT
+  EXECUTOR --> ANALYTICS
+  EXECUTOR --> COMPLIANCE
+  EXECUTOR --> RISK
 
-    %% MCP Router Management
-    ROUTER --> CRM_MCP
-    ROUTER --> LENDING_MCP
-    ROUTER --> CREDIT_MCP
-    ROUTER --> BANKING_MCP
-    ROUTER --> ANALYTICS_MCP
-    ROUTER --> COMPLIANCE_MCP
+  CRM --> ROUTER
+  LENDING --> ROUTER
+  CREDIT --> ROUTER
+  ANALYTICS --> ROUTER
+  COMPLIANCE --> ROUTER
+  RISK --> ROUTER
 
-    %% MCP to Banking APIs
-    CRM_MCP --> CRM_API
-    LENDING_MCP --> LENDING_API
-    CREDIT_MCP --> CREDIT_API
-    BANKING_MCP --> BANKING_API
-    ANALYTICS_MCP --> ANALYTICS_API
-    COMPLIANCE_MCP --> COMPLIANCE_API
+  ROUTER --> CRM_MCP
+  ROUTER --> LENDING_MCP
+  ROUTER --> CREDIT_MCP
+  ROUTER --> BANKING_MCP
+  ROUTER --> ANALYTICS_MCP
+  ROUTER --> COMPLIANCE_MCP
+  ROUTER --> RISK_MCP
 
-    %% Human Escalation
-    SUPERVISOR -.-> EXPERTS
-    COMPLIANCE -.-> COMPLIANCE_TEAM
-    RISK -.-> EXPERTS
+  CRM_MCP --> CRM_API
+  LENDING_MCP --> LENDING_API
+  CREDIT_MCP --> CREDIT_API
+  BANKING_MCP --> BANKING_API
+  ANALYTICS_MCP --> ANALYTICS_API
+  COMPLIANCE_MCP --> COMPLIANCE_API
+  RISK_MCP --> RISK_API
+
+  SUPERVISOR -.-> EXPERTS
+  COMPLIANCE -.-> COMPLIANCE_TEAM
 ```
 
 ### 2.2 Enhanced Architecture Components
@@ -157,37 +153,20 @@ graph TB
 
 #### 2.2.2 Enhanced Request Flow
 ```mermaid
-sequenceDiagram
-    participant User
-    participant API_GW as API Gateway
-    participant Supervisor
-    participant LangGraph
-    participant Memory
-    participant Agent as Banking Agent
-    participant MCP as MCP Server
-    participant KPS as KPS APIs
-    participant Human as Human Expert
+graph TD
+    User[User] --> API_GW[API Gateway]
+    API_GW --> Supervisor
+    Supervisor --> Memory
+    Supervisor --> LangGraph
+    LangGraph --> Agent[Banking Agent]
+    Agent --> GUARDRAILS[Guardrails]
+    GUARDRAILS --> MCP_ROUTER[MCP Router]
+    MCP_ROUTER --> MCP[MCP Server]
+    MCP --> KPS[KPS Gateway]
+    KPS --> API[Banking API]
+    API --> KPS --> MCP --> Agent --> LangGraph --> Supervisor
 
-    User->>API_GW: Banking Request
-    API_GW->>Supervisor: Authenticated Request
-    Supervisor->>Memory: Retrieve Context
-    Memory-->>Supervisor: User Profile & History
-    Supervisor->>LangGraph: Plan Workflow
-    LangGraph->>Agent: Execute Task
-    Agent->>MCP: API Call via MCP
-    MCP->>KPS: Banking Operation
-    KPS-->>MCP: Response
-    MCP-->>Agent: Structured Response
-
-    alt High Risk or Complex
-        Agent->>Human: Escalate for Review
-        Human-->>Agent: Approval/Guidance
-    end
-
-    Agent-->>LangGraph: Task Result
-    LangGraph-->>Supervisor: Workflow Complete
-    Supervisor->>Memory: Update Context
-    Supervisor-->>User: Final Response
+    Agent -.-> Human[Human Expert]
 ```
 
 #### 2.2.3 Memory System Integration
@@ -416,12 +395,13 @@ graph TB
         end
 
         subgraph MCP_SERVERS["Banking MCP Servers"]
-            CRM_MCP[CRM MCP Server<br/>Tools: Customer Lookup<br/>Resources: Customer Data<br/>Prompts: Service Templates]
-            LENDING_MCP[Lending MCP Server<br/>Tools: Application Processing<br/>Resources: Loan Products<br/>Prompts: Decision Templates]
-            CREDIT_MCP[Credit MCP Server<br/>Tools: Credit Scoring<br/>Resources: Credit Policies<br/>Prompts: Risk Explanations]
-            BANKING_MCP[Banking Operations MCP<br/>Tools: Account Management<br/>Resources: Banking Products<br/>Prompts: Operation Templates]
-            ANALYTICS_MCP[Analytics MCP Server<br/>Tools: Report Generation<br/>Resources: Data Models<br/>Prompts: Analysis Templates]
-            COMPLIANCE_MCP[Compliance MCP Server<br/>Tools: Regulatory Checks<br/>Resources: Compliance Rules<br/>Prompts: Audit Templates]
+            CRM_MCP[CRM MCP Server]
+            LENDING_MCP[Lending MCP Server]
+            CREDIT_MCP[Credit MCP Server]
+            BANKING_MCP[Banking Operations MCP]
+            ANALYTICS_MCP[Analytics MCP Server]
+            COMPLIANCE_MCP[Compliance MCP Server]
+            RISK_MCP[Risk MCP Server]
         end
 
         subgraph KPS_INTEGRATION["KPS Integration Layer"]
@@ -442,6 +422,7 @@ graph TB
             LENDING_API[Lending APIs]
             CREDIT_API[Credit APIs]
             FRAUD_API[Fraud APIs]
+            RISK_API[Risk APIs]
         end
 
         subgraph EXTERNAL_APIS["External Integration APIs"]
@@ -451,17 +432,17 @@ graph TB
         end
     end
 
-    %% Agent to MCP Direct Connections (Key Missing Link!)
-    CRM_AGENT --> CRM_MCP
-    LENDING_AGENT --> LENDING_MCP
-    CREDIT_AGENT --> CREDIT_MCP
-    ANALYTICS_AGENT --> ANALYTICS_MCP
-    COMPLIANCE_AGENT --> COMPLIANCE_MCP
-    RISK_AGENT --> BANKING_MCP
+    %% Agents connect via MCP Router (no direct server links)
+    CRM_AGENT --> MCP_ROUTER
+    LENDING_AGENT --> MCP_ROUTER
+    CREDIT_AGENT --> MCP_ROUTER
+    ANALYTICS_AGENT --> MCP_ROUTER
+    COMPLIANCE_AGENT --> MCP_ROUTER
+    RISK_AGENT --> MCP_ROUTER
 
-    %% LangGraph Orchestration
-    LANGGRAPH --> MCP_ORCHESTRATOR
-    MCP_ORCHESTRATOR --> MCP_ROUTER
+    %% Optional Guardrails between orchestration and router
+    MCP_ORCHESTRATOR -->|policy checks| GUARDRAILS[Guardrails]
+    GUARDRAILS --> MCP_ROUTER
 
     %% MCP Router Management
     MCP_ROUTER --> MCP_REGISTRY
@@ -472,6 +453,7 @@ graph TB
     MCP_ROUTER --> BANKING_MCP
     MCP_ROUTER --> ANALYTICS_MCP
     MCP_ROUTER --> COMPLIANCE_MCP
+    MCP_ROUTER --> RISK_MCP
 
     %% MCP to KPS Integration
     CRM_MCP --> API_GATEWAY
@@ -480,6 +462,7 @@ graph TB
     BANKING_MCP --> API_GATEWAY
     ANALYTICS_MCP --> API_GATEWAY
     COMPLIANCE_MCP --> API_GATEWAY
+    RISK_MCP --> API_GATEWAY
 
     %% KPS Processing
     API_GATEWAY --> DATA_PIPELINE
@@ -492,6 +475,7 @@ graph TB
     API_GATEWAY --> LENDING_API
     API_GATEWAY --> CREDIT_API
     API_GATEWAY --> FRAUD_API
+    API_GATEWAY --> RISK_API
     API_GATEWAY --> REGULATORY_API
     API_GATEWAY --> MARKET_API
     API_GATEWAY --> THIRD_PARTY_API
@@ -546,20 +530,12 @@ Each banking agent maintains direct connections to its corresponding MCP server(
 
 #### 4.3.1 Request Flow Pattern
 ```mermaid
-sequenceDiagram
-    participant Agent as Banking Agent
-    participant MCP as MCP Server
-    participant KPS as KPS Gateway
-    participant API as Banking API
-
-    Agent->>MCP: MCP Request (Tools/Resources/Prompts)
-    MCP->>MCP: Validate Request & Context
-    MCP->>KPS: Transform to Banking API Call
-    KPS->>API: Execute Banking Operation
-    API-->>KPS: Banking Response
-    KPS->>MCP: Normalized Response
-    MCP->>MCP: Apply Business Logic & Formatting
-    MCP-->>Agent: Structured MCP Response
+graph TD
+  Agent[Banking Agent] --> ROUTER[MCP Router]
+  ROUTER --> MCP[MCP Server]
+  MCP --> KPS[KPS Gateway]
+  KPS --> API[Banking API]
+  API --> KPS --> MCP --> ROUTER --> Agent
 ```
 
 #### 4.3.2 Communication Benefits
